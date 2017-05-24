@@ -3,7 +3,7 @@
 namespace ShortPixel;
 
 const LIBRARY_CODE = "sp-sdk";
-const VERSION = "0.9.6";
+const VERSION = "0.9.8";
 
 class ShortPixel {
     const MAX_ALLOWED_FILES_PER_CALL = 10;
@@ -287,9 +287,17 @@ function delTree($dir, $keepBase = true) {
  */
 function MB_basename($Path, $suffix = false){
     $Separator = " qq ";
-    $Path = preg_replace("/[^ ]/u", $Separator."\$0".$Separator, $Path);
+    $qqPath = preg_replace("/[^ ]/u", $Separator."\$0".$Separator, $Path);
+    if(!$qqPath) { //this is not an UTF8 string!!
+        $fileName = end(explode(DIRECTORY_SEPARATOR, $Path));
+        $pos = strpos($fileName, $suffix);
+        if($pos !== false) {
+            return substr($fileName, 0, $pos);
+        }
+        return $fileName;
+    }
     $suffix = preg_replace("/[^ ]/u", $Separator."\$0".$Separator, $suffix);
-    $Base = basename($Path, $suffix);
+    $Base = basename($qqPath, $suffix);
     $Base = str_replace($Separator, "", $Base);
     return $Base;
 }

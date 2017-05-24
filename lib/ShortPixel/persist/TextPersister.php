@@ -58,7 +58,7 @@ class TextPersister implements Persister {
             }
             $fp = $this->getMetaFile($path);
 
-            $info = (object)array('status' => 'pending', 'total' => 0, 'succeeded' => 0, 'pending' => 0, 'same' => 0, 'failed' => 0);
+            $info = (object)array('status' => 'pending', 'total' => 0, 'succeeded' => 0, 'pending' => 0, 'same' => 0, 'failed' => 0, 'todo' => null);
             $files = scandir($path);
             $dataArr = $this->readMetaFile($fp);
             $ignore = array_merge(array('.','..','ShortPixelBackups'), $exclude);
@@ -108,8 +108,10 @@ class TextPersister implements Persister {
                 $this->closeMetaFile($path);
             }
 
-            if($info->pending == 0) $info->status = 'success';
-            return (object)$info;
+            if($info->pending == 0) {
+                $info->status = 'success';
+            }
+            $info->todo = $this->getTodo($path, 1, $exclude);
         }
         else {
             $toClose = $this->openMetaFileIfNeeded(dirname($path));
